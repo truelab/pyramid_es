@@ -32,6 +32,9 @@ def includeme(config):
     if asbool(settings.get('elastic.ensure_index_on_start')):
         client.ensure_index()
 
+    config.include('pyramid_zcml')
+    config.load_zcml('configure.zcml')
+
     registry.pyramid_es_client = client
 
 
