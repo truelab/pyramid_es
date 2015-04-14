@@ -17,6 +17,7 @@ from transaction.interfaces import ISavepointDataManager
 
 from .query import ElasticQuery
 from .result import ElasticResultRecord
+from .util import get_elastic_adapter
 
 log = logging.getLogger(__name__)
 
@@ -263,11 +264,12 @@ class ElasticClient(object):
         """
         Add or update the indexed document for an object.
         """
-        doc = obj.elastic_document()
+        elastic_adapter = get_elastic_adapter(obj)
+        doc = elastic_adapter.elastic_document()
 
-        doc_type = obj.__class__.__name__
+        doc_type = elastic_adapter.elastic_document_type()
         doc_id = doc.pop("_id")
-        doc_parent = obj.elastic_parent
+        doc_parent = elastic_adapter.elastic_parent
 
         log.debug('Indexing object:\n%s', pformat(doc))
         log.debug('Type is %r', doc_type)
@@ -284,11 +286,12 @@ class ElasticClient(object):
         """
         Delete the indexed document for an object.
         """
-        doc = obj.elastic_document()
+        elastic_adapter = get_elastic_adapter(obj)
+        doc = elastic_adapter.elastic_document()
 
-        doc_type = obj.__class__.__name__
+        doc_type = elastic_adapter.elastic_document_type()
         doc_id = doc.pop("_id")
-        doc_parent = obj.elastic_parent
+        doc_parent = elastic_adapter.elastic_parent
 
         self.delete_document(id=doc_id,
                              doc_type=doc_type,
@@ -351,9 +354,12 @@ class ElasticClient(object):
         if isinstance(obj, tuple):
             doc_type, doc_id = obj
         else:
-            doc_type, doc_id = obj.__class__.__name__, obj.id
-            if obj.elastic_parent:
-                routing = obj.elastic_parent
+            elastic_adapter = get_elastic_adapter(obj)
+            doc_type = elastic_adapter.elastic_document_type()
+            doc_id = elastic_adapter.elastic_document_id()
+            elastic_parent = elastic_adapter.elastic_parent
+            if elastic_parent:
+                routing = elastic_parent
 
         kwargs = dict(index=self.index,
                       doc_type=doc_type,
