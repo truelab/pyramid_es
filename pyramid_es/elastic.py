@@ -67,3 +67,15 @@ class ElasticBWC(ElasticBase):
         Returns the document id
         """
         return self.context.id
+
+    def __getattr__(self, key):
+        """ This __getattr__ is not needed, we include it for backwards
+            compatibility issues. This way existing resources that
+            inherits from the ES mixin class will work without having
+            to change the elastic mapping with an attr='context'.
+        """
+        if key not in ('elastic_mapping',
+                       'elastic_document_type',
+                       'elastic_document_id'):
+            return getattr(self.context, key)
+        return super(ElasticBWC, self).__get__(key)
