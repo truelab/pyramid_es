@@ -1,6 +1,12 @@
-from pyramid_es.mixin import (
+from zope.interface import (
+    implements,
+    Interface,
+    )
+from zope.component import adapts
+from .mixin import (
     ElasticParent,
     )
+from .interfaces import IElastic
 
 
 class ElasticBase(object):
@@ -11,8 +17,7 @@ class ElasticBase(object):
     def __init__(self, context):
         self.context = context
 
-    @classmethod
-    def elastic_mapping(cls):
+    def elastic_mapping(self):
         """
         Return an ES mapping.
         """
@@ -38,3 +43,27 @@ class ElasticBase(object):
 
     __elastic_parent__ = None
     elastic_parent = ElasticParent()
+
+
+class ElasticBWC(ElasticBase):
+    """ Backwards compatible adapter for traditional ES mixin classes """
+    implements(IElastic)
+    adapts(Interface)
+
+    def elastic_mapping(self):
+        """
+        Return an ES mapping.
+        """
+        return self.context.elastic_mapping()
+
+    def elastic_document_type(self):
+        """
+        The elastic document type
+        """
+        return self.context.__class__.__name__
+
+    def elastic_document_id(self):
+        """
+        Returns the document id
+        """
+        return self.context.id
