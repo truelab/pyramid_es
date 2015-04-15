@@ -56,6 +56,11 @@ def make_app():
     config = Configurator(settings=settings)
     config.include('pyramid_es')
     config.include('pyramid_tm')
+    config.include('pyramid_zcml')
+
+    from ..elastic import ElasticBWC
+    from ..interfaces import IElastic
+    config.registry.registerAdapter(ElasticBWC, provided=IElastic)
 
     config.add_route('index', '/')
     config.add_view(index_view, route_name='index', renderer='json')
@@ -67,6 +72,10 @@ def make_app():
     es_client.ensure_index(recreate=True)
 
     sample = Todo(description='Example to-do item')
+    from pyramid.testing import DummyRequest
+    dummy_request = DummyRequest()
+    dummy_request.registry = config.registry
+    sample.request = dummy_request
     es_client.index_object(sample, immediate=True)
 
     return config.make_wsgi_app()
