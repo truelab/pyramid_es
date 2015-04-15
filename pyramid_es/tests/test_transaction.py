@@ -29,11 +29,6 @@ class Todo(Base, ElasticMixin):
 class TestClient(TestCase):
 
     def setUp(self):
-        from pyramid.threadlocal import get_current_registry
-        from ..interfaces import IElastic
-        from ..elastic import ElasticBWC
-        registry = get_current_registry()
-        registry.registerAdapter(ElasticBWC, provided=IElastic)
         self.client = ElasticClient(servers=['localhost:9200'],
                                     index='pyramid_es_tests_txn',
                                     use_transaction=True)
