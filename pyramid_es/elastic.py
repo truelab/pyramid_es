@@ -91,6 +91,10 @@ class ElasticBWC(ElasticBase):
         """
         if key not in ('elastic_mapping',
                        'elastic_document_type',
-                       'elastic_document_id'):
+                       'elastic_document',
+                       'elastic_document_id',
+                       '__elastic_parent__',
+                       'elastic_parent',
+                       ):
             return getattr(self.context, key)
         return super(ElasticBWC, self).__get__(key)
