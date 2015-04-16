@@ -87,6 +87,46 @@ class TestCustomAdapter(TestCase):
         todos = [doc.description for doc in result]
         self.assertNotIn('Finish exhaustive test suite', todos)
 
+    def test_index_and_delete_document2(self):
+        """ We are testing the default indexing strategy (simulating real
+            adapter registration)
+        """
+        from ..elastic import ElasticBWC
+        from ..interfaces import IElastic
+        from zope.interface import Interface
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
+        registry.registerAdapter(ElasticBWC, (Interface,), provided=IElastic)
+        import transaction
+        todo = self.Todo(id=42, description='Finish exhaustive test suite')
+
+        with transaction.manager:
+            self.client.index_object(todo)
+        self.client.flush(force=True)
+        self.client.refresh()
+
+        # Search for this document and make sure it exists.
+        q = self.client.query(self.Todo, q='Yeah!')
+        self.assertEquals(0, q.execute().total)
+
+        # Search for this document and make sure it exists.
+        q = self.client.query(self.Todo, q='exhaustive')
+        result = q.execute()
+        todos = [doc.description for doc in result]
+        self.assertIn('Finish exhaustive test suite', todos)
+
+        with transaction.manager:
+            self.client.delete_object(todo)
+
+        self.client.flush(force=True)
+        self.client.refresh()
+
+        # Search for this document and make sure it DOES NOT exist.
+        q = self.client.query(self.Todo, q='exhaustive')
+        result = q.execute()
+        todos = [doc.description for doc in result]
+        self.assertNotIn('Finish exhaustive test suite', todos)
+
     def test_index_and_delete_document_custom(self):
         """ We register a custom adapter that alters the indexing strategy """
         from ..elastic import ElasticBWC
