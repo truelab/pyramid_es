@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from pyramid.settings import asbool
+from pyramid.threadlocal import get_current_registry
 
 from .client import ElasticClient
 from .elastic import ElasticBWC
@@ -48,4 +49,6 @@ def get_client(request):
     registry = getattr(request, 'registry', None)
     if registry is None:
         registry = request
+    if not hasattr(registry, 'pyramid_es_client'):
+        registry = get_current_registry()
     return registry.pyramid_es_client
