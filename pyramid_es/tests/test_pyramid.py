@@ -56,7 +56,6 @@ def make_app():
     config = Configurator(settings=settings)
     config.include('pyramid_es')
     config.include('pyramid_tm')
-    config.include('pyramid_zcml')
 
     from ..elastic import ElasticBWC
     from ..interfaces import IElastic

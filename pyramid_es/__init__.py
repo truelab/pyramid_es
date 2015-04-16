@@ -3,6 +3,8 @@ from __future__ import (absolute_import, division, print_function,
 from pyramid.settings import asbool
 
 from .client import ElasticClient
+from .elastic import ElasticBWC
+from .interfaces import IElastic
 
 
 __version__ = '0.3.2.dev'
@@ -32,8 +34,8 @@ def includeme(config):
     if asbool(settings.get('elastic.ensure_index_on_start')):
         client.ensure_index()
 
-    config.include('pyramid_zcml')
-    config.load_zcml('configure.zcml')
+    # register BWC adapter
+    config.registry.registerAdapter(ElasticBWC, provided=IElastic)
 
     registry.pyramid_es_client = client
 
