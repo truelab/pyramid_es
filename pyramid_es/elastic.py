@@ -68,6 +68,16 @@ class ElasticBWC(ElasticBase):
         """
         return self.context.id
 
+    @property
+    def elastic_parent(self):
+        """ Overrides for backwards compatibility """
+        return self.context.elastic_parent
+
+    @property
+    def __elastic_parent__(self):
+        """ Overrides for backwards compatibility """
+        return self.context.__elastic_parent__
+
     def __getattr__(self, key):
         """ This __getattr__ is not needed, we include it for backwards
             compatibility issues. This way existing resources that
