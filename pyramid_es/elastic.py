@@ -46,7 +46,12 @@ class ElasticBase(object):
 
 
 class ElasticBWC(ElasticBase):
-    """ Backwards compatible adapter for traditional ES mixin classes """
+    """ Backwards compatible adapter for traditional ES mixin classes.
+
+        DO NOT INTERIT FROM THIS CLASS, this is just an adapter that will
+        be used under the hood by pyramid_es in order to provide backwards
+        compatibility with existing packages built with mixin classes.
+    """
     implements(IElastic)
     adapts(Interface)
 
