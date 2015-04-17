@@ -26,15 +26,15 @@ class TestCustomAdapter(TestCase):
         from ..mixin import ElasticMixin, ESMapping, ESString
         from sqlalchemy import Column, types
         from sqlalchemy.ext.declarative import declarative_base
-        from zope.interface import implements, Interface
+        from zope.interface import implementer, Interface
         Base = declarative_base()
 
         class ITodo(Interface):
             pass
         self.ITodo = ITodo
 
+        @implementer(ITodo)
         class Todo(Base, ElasticMixin):
-            implements(ITodo)
             __tablename__ = 'todos'
             id = Column(types.Integer, primary_key=True)
             description = Column(types.Unicode(40))

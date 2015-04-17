@@ -1,5 +1,5 @@
 from zope.interface import (
-    implements,
+    implementer,
     Interface,
     )
 from zope.component import adapts
@@ -45,6 +45,7 @@ class ElasticBase(object):
     elastic_parent = ElasticParent()
 
 
+@implementer(IElastic)
 class ElasticBWC(ElasticBase):
     """ Backwards compatible adapter for traditional ES mixin classes.
 
@@ -52,7 +53,6 @@ class ElasticBWC(ElasticBase):
         be used under the hood by pyramid_es in order to provide backwards
         compatibility with existing packages built with mixin classes.
     """
-    implements(IElastic)
     adapts(Interface)
 
     def elastic_mapping(self):
